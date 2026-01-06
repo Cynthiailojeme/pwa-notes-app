@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Note } from "@/lib/types";
 import { useNotes } from "@/hooks/useNotes";
+import { initDB } from "@/lib/indexedDB";
+import { syncManager } from "@/lib/syncManager";
 import NoteList from "@/components/NoteList";
 import NoteForm from "@/components/NoteForm";
+import SyncStatus from "@/components/SyncStatus";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
+import { registerServiceWorker } from "@/lib/serviceWorkerRegistration";
 import ViewNote from "@/components/ViewNote";
 
 export default function Home() {
@@ -15,6 +19,19 @@ export default function Home() {
   const [viewNote, setViewNote] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | undefined>();
   const [deletingNote, setDeletingNote] = useState<Note | undefined>();
+
+  useEffect(() => {
+    // Initialize IndexedDB
+    initDB().catch(console.error);
+
+    // Register service worker
+    registerServiceWorker();
+
+    // Initial sync if online
+    if (navigator.onLine) {
+      syncManager.fetchAndMergeNotes().catch(console.error);
+    }
+  }, []);
 
   const handleSave = async (title: string, content: string) => {
     if (editingNote) {
@@ -54,7 +71,7 @@ export default function Home() {
     setEditingNote(undefined);
   };
 
-  if (!loading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -84,6 +101,11 @@ export default function Home() {
             <Plus className="w-5 h-5" />
             <span>New Note</span>
           </button>
+        </div>
+
+        {/* Sync Status */}
+        <div className="mb-6">
+          <SyncStatus />
         </div>
 
         {/* Notes List */}

@@ -59,7 +59,6 @@ export default function NoteCard({
       </p>
 
       {/* Footer */}
-
       <div className="flex flex-col gap-2 pt-3 border-t border-gray-100">
         {/* Timestamps - Horizontal Layout */}
         <div className="flex items-center justify-between text-xs text-gray-500">
@@ -79,7 +78,7 @@ export default function NoteCard({
           {/* Modified - only if different */}
           {wasModified && (
             <div
-              className="flex items-center gap-1 text-blue-600"
+              className="flex items-center gap-1 text-primary"
               title={`Modified: ${format(new Date(note.modified_at), "PPpp")}`}
             >
               <Clock className="w-3 h-3" />
