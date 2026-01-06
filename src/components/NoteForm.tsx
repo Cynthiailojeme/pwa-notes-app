@@ -77,7 +77,7 @@ export default function NoteForm({ note, onSave, onCancel }: NoteFormProps) {
           <div>
             <label
               htmlFor="title"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-base font-medium text-gray-700 mb-1"
             >
               Title
             </label>
@@ -116,7 +116,7 @@ export default function NoteForm({ note, onSave, onCancel }: NoteFormProps) {
           <div>
             <label
               htmlFor="content"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-base font-medium text-gray-700 mb-1"
             >
               Content
             </label>
