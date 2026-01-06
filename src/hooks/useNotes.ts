@@ -1,6 +1,7 @@
 // Notes management hook
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Note } from '@/lib/types';
+import { syncManager } from '@/lib/syncManager';
 import { getAllNotes } from '@/lib/indexedDB';
 
 export function useNotes() {
@@ -21,8 +22,25 @@ export function useNotes() {
     }
   };
 
+  useEffect(() => {
+    refreshNotes();
+
+    // Listen for sync updates
+    const unsubscribe = syncManager.onSyncStateChange(refreshNotes);
+
+    // Listen for sync complete from service worker
+    const handleSyncComplete = () => refreshNotes();
+    window.addEventListener('sync-complete', handleSyncComplete);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener('sync-complete', handleSyncComplete);
+    };
+  }, []);
+
   const createNote = async (title: string, content: string) => {
     try {
+      await syncManager.addNote(title, content);
       await refreshNotes();
     } catch (err) {
       console.error('Failed to create note:', err);
@@ -32,6 +50,7 @@ export function useNotes() {
 
   const updateNote = async (id: string, updates: Partial<Note>) => {
     try {
+      await syncManager.updateNote(id, updates);
       await refreshNotes();
     } catch (err) {
       console.error('Failed to update note:', err);
@@ -41,6 +60,7 @@ export function useNotes() {
 
   const deleteNote = async (id: string) => {
     try {
+      await syncManager.deleteNote(id);
       await refreshNotes();
     } catch (err) {
       console.error('Failed to delete note:', err);
