@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PWA Notes App - Offline-First Note Taking
 
-## Getting Started
+An offline-first Progressive Web App for note-taking built with Next.js, TypeScript, and Supabase.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- ✅ Fully functional offline
+- ✅ Automatic sync when online
+- ✅ Background sync support
+- ✅ IndexedDB for persistent storage
+- ✅ Service Worker caching
+- ✅ Responsive design
+- ✅ Real-time sync status
+- ✅ Conflict resolution (Last Write Wins)
+
+## Tech Stack
+
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **Backend:** Supabase
+- **Storage:** IndexedDB (via idb)
+- **Styling:** Tailwind CSS
+- **Icons:** Lucide React
+
+## Installation
+
+```
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Configuration
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create `.env.local`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_USER_ID=your-email@example.com
+```
 
-## Learn More
+## Development
 
-To learn more about Next.js, take a look at the following resources:
+```
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Testing Offline Mode
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Open DevTools (F12)
+2. Go to Network tab
+3. Select "Offline" from dropdown
+4. Create/edit/delete notes
+5. Go back online and watch sync
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Deployed on Vercel: [[pwa-notes-app](https://pwa-notes-app-ci.vercel.app/)]
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Conflict Resolution Strategy
+
+**Last Write Wins (LWW):** When conflicts occur between local and server data, the note with the most recent `modified_at` timestamp is kept. This ensures users always see their most recent changes.
+
+## Architecture
+
+- **Service Worker:** Caches assets and API responses
+- **IndexedDB:** Stores notes locally with sync queue
+- **Sync Manager:** Handles bidirectional sync
+- **Background Sync API:** Retries failed operations
