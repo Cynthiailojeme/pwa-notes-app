@@ -2,16 +2,22 @@
 "use client";
 
 import { Note } from "@/lib/types";
-import { Edit, Trash2, Clock } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { Edit, Trash2, Clock, Calendar, Eye } from "lucide-react";
+import { formatDistanceToNow, format } from "date-fns";
 
 interface NoteCardProps {
   note: Note;
+  onView: (note: Note) => void;
   onEdit: (note: Note) => void;
   onDelete: (id: string) => void;
 }
 
-export default function NoteCard({ note, onEdit, onDelete }: NoteCardProps) {
+export default function NoteCard({
+  note,
+  onView,
+  onEdit,
+  onDelete,
+}: NoteCardProps) {
   const getSyncStatusColor = () => {
     switch (note._syncStatus) {
       case "synced":
@@ -26,6 +32,8 @@ export default function NoteCard({ note, onEdit, onDelete }: NoteCardProps) {
         return "bg-gray-100 text-gray-700";
     }
   };
+
+  const wasModified = note.created_at !== note.modified_at;
 
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-5 border border-gray-200">
@@ -46,22 +54,54 @@ export default function NoteCard({ note, onEdit, onDelete }: NoteCardProps) {
       </div>
 
       {/* Content */}
-      <p className="text-gray-600 text-sm mb-4 line-clamp-2 h-10">{note.content}</p>
+      <p className="text-gray-600 text-sm mb-4 line-clamp-2 h-10">
+        {note.content}
+      </p>
 
       {/* Footer */}
-      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-        {/* Timestamp */}
-        <div className="flex items-center gap-1 text-xs text-gray-500">
-          <Clock className="w-3 h-3" />
-          <span>
-            {formatDistanceToNow(new Date(note.modified_at), {
-              addSuffix: true,
-            })}
-          </span>
+
+      <div className="flex flex-col gap-2 pt-3 border-t border-gray-100">
+        {/* Timestamps - Horizontal Layout */}
+        <div className="flex items-center justify-between text-xs text-gray-500">
+          {/* Created */}
+          <div
+            className="flex items-center gap-1"
+            title={`Created: ${format(new Date(note.created_at), "PPpp")}`}
+          >
+            <Calendar className="w-3 h-3" />
+            <span>
+              {formatDistanceToNow(new Date(note.created_at), {
+                addSuffix: true,
+              })}
+            </span>
+          </div>
+
+          {/* Modified - only if different */}
+          {wasModified && (
+            <div
+              className="flex items-center gap-1 text-blue-600"
+              title={`Modified: ${format(new Date(note.modified_at), "PPpp")}`}
+            >
+              <Clock className="w-3 h-3" />
+              <span>
+                edited{" "}
+                {formatDistanceToNow(new Date(note.modified_at), {
+                  addSuffix: true,
+                })}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={() => onView(note)}
+            className="cursor-pointer p-2 hover:bg-gray-100 rounded-md transition-colors"
+            title="View note"
+          >
+            <Eye className="w-4 h-4 text-gray-600" />
+          </button>
           <button
             onClick={() => onEdit(note)}
             className="cursor-pointer p-2 hover:bg-gray-100 rounded-md transition-colors"
