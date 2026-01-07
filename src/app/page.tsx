@@ -148,7 +148,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* New Note Button with Ripple Effect */}
+          {/* New Note Button */}
           <button
             onClick={handleNewNote}
             className="relative overflow-hidden flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover active:scale-95 transition-all duration-150 shadow-md hover:shadow-lg group"
