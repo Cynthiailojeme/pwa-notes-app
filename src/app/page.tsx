@@ -133,7 +133,7 @@ export default function Home() {
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="flex flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">My Notes</h1>
             <p className="text-gray-600 mt-1">
@@ -155,7 +155,7 @@ export default function Home() {
             aria-label="Create new note"
           >
             <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-            <span className="font-medium">New Note</span>
+            <span className="hidden lg:flex font-medium">New Note</span>
             <div className="absolute inset-0 bg-white/20 transform scale-0 group-hover:scale-100 rounded-lg transition-transform duration-300" />
           </button>
         </div>
