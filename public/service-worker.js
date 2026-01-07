@@ -130,6 +130,7 @@ function openDatabase() {
   });
 }
 
+// This is hardcoded because service workers can't access environment variables.
 async function executeOperation(operation) {
   const baseUrl = 'https://scwaxiuduzyziuyjfwda.supabase.co/rest/v1';
   const apiKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjd2F4aXVkdXp5eml1eWpmd2RhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxMTk0NTUsImV4cCI6MjA4MjY5NTQ1NX0.W7LMDb-a_bN153TyJgNU0zpT8O6jPIC8ysfOOHSe0h0';
