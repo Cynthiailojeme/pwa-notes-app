@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Plus } from "lucide-react";
 import { Note } from "@/lib/types";
 import { useNotes } from "@/hooks/useNotes";
@@ -10,6 +10,8 @@ import NoteList from "@/components/NoteList";
 import NoteForm from "@/components/NoteForm";
 import SyncStatus from "@/components/SyncStatus";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
+import SearchBar from "@/components/SearchBar";
+import SkeletonLoader from "@/components/SkeletonLoader";
 import { registerServiceWorker } from "@/lib/serviceWorkerRegistration";
 import ViewNote from "@/components/ViewNote";
 
@@ -19,6 +21,13 @@ export default function Home() {
   const [viewNote, setViewNote] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | undefined>();
   const [deletingNote, setDeletingNote] = useState<Note | undefined>();
+
+  // Search and filter state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"created" | "modified" | "title">(
+    "modified"
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   useEffect(() => {
     // Initialize IndexedDB
@@ -32,6 +41,45 @@ export default function Home() {
       syncManager.fetchAndMergeNotes().catch(console.error);
     }
   }, []);
+
+  // Filter and sort notes
+  const filteredAndSortedNotes = useMemo(() => {
+    let filtered = notes;
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = notes.filter(
+        (note) =>
+          note.title.toLowerCase().includes(query) ||
+          note.content.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortBy) {
+        case "created":
+          comparison =
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          break;
+        case "modified":
+          comparison =
+            new Date(a.modified_at).getTime() -
+            new Date(b.modified_at).getTime();
+          break;
+        case "title":
+          comparison = a.title.localeCompare(b.title);
+          break;
+      }
+
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+
+    return sorted;
+  }, [notes, searchQuery, sortBy, sortOrder]);
 
   const handleSave = async (title: string, content: string) => {
     if (editingNote) {
@@ -71,35 +119,44 @@ export default function Home() {
     setEditingNote(undefined);
   };
 
+  const handleNewNote = () => {
+    setEditingNote(undefined);
+    setShowForm(true);
+  };
+
+  // Show skeleton loader during initial load
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading notes...</p>
-        </div>
-      </div>
-    );
+    return <SkeletonLoader />;
   }
 
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">My Notes</h1>
             <p className="text-gray-600 mt-1">
               {notes.length} {notes.length === 1 ? "note" : "notes"}
+              {searchQuery &&
+                filteredAndSortedNotes.length !== notes.length && (
+                  <span className="text-blue-600">
+                    {" "}
+                    ({filteredAndSortedNotes.length} matching)
+                  </span>
+                )}
             </p>
           </div>
 
+          {/* New Note Button with Ripple Effect */}
           <button
-            onClick={() => setShowForm(true)}
-            className="cursor-pointer flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors shadow-md"
+            onClick={handleNewNote}
+            className="relative overflow-hidden flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-hover active:scale-95 transition-all duration-150 shadow-md hover:shadow-lg group"
+            aria-label="Create new note"
           >
-            <Plus className="w-5 h-5" />
-            <span>New Note</span>
+            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+            <span className="font-medium">New Note</span>
+            <div className="absolute inset-0 bg-white/20 transform scale-0 group-hover:scale-100 rounded-lg transition-transform duration-300" />
           </button>
         </div>
 
@@ -108,21 +165,29 @@ export default function Home() {
           <SyncStatus />
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-6">
+          <SearchBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            sortOrder={sortOrder}
+            onSortOrderChange={setSortOrder}
+          />
+        </div>
+
         {/* Notes List */}
         <NoteList
-          notes={notes}
+          notes={filteredAndSortedNotes}
           onView={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          searchQuery={searchQuery}
         />
 
         {/* View Note Modal */}
-        {viewNote && (
-          <ViewNote
-            note={editingNote}
-            onCancel={handleCloseForm}
-          />
-        )}
+        {viewNote && <ViewNote note={editingNote} onCancel={handleCloseForm} />}
 
         {/* Note Form Modal */}
         {showForm && (
