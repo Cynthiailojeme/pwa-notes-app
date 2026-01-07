@@ -83,7 +83,7 @@ export default function NoteCard({
             >
               <Clock className="w-3 h-3" />
               <span>
-                edited{" "}
+                Edited{" "}
                 {formatDistanceToNow(new Date(note.modified_at), {
                   addSuffix: true,
                 })}

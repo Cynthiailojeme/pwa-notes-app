@@ -1,8 +1,8 @@
 // Sync indicator
-'use client';
+"use client";
 
-import { useSync } from '@/hooks/useSync';
-import { Cloud, CloudOff, RefreshCw } from 'lucide-react';
+import { useSync } from "@/hooks/useSync";
+import { Cloud, CloudOff, RefreshCw } from "lucide-react";
 
 export default function SyncStatus() {
   const { isOnline, isSyncing, pendingCount, triggerSync } = useSync();
@@ -17,16 +17,14 @@ export default function SyncStatus() {
           <CloudOff className="w-5 h-5 text-gray-400" />
         )}
         <span className="text-sm font-medium">
-          {isOnline ? 'Online' : 'Offline'}
+          {isOnline ? "Online" : "Offline"}
         </span>
       </div>
 
       {/* Pending Count */}
       {pendingCount > 0 && (
         <div className="flex items-center gap-2 px-3 py-1 bg-amber-50 rounded-md">
-          <span className="text-sm text-amber-700">
-            {pendingCount} pending
-          </span>
+          <span className="text-sm text-amber-700">{pendingCount} pending</span>
         </div>
       )}
 
@@ -37,14 +35,9 @@ export default function SyncStatus() {
           disabled={isSyncing}
           className="flex items-center gap-2 px-3 py-1 bg-primary text-white rounded-md hover:bg-primary-hover disabled:opacity-50"
         >
-          <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-          <span className="text-sm">Sync</span>
+          <RefreshCw className={`w-4 h-4 ${isSyncing ? "animate-spin" : ""}`} />
+          <span className="text-sm">{isSyncing ? "Syncing..." : "Sync"}</span>
         </button>
-      )}
-
-      {/* Syncing Indicator */}
-      {isSyncing && (
-        <span className="text-sm text-gray-500">Syncing...</span>
       )}
     </div>
   );
