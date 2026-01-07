@@ -140,7 +140,7 @@ export default function Home() {
               {notes.length} {notes.length === 1 ? "note" : "notes"}
               {searchQuery &&
                 filteredAndSortedNotes.length !== notes.length && (
-                  <span className="text-blue-600">
+                  <span className="text-green-600">
                     {" "}
                     ({filteredAndSortedNotes.length} matching)
                   </span>

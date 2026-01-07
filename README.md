@@ -12,6 +12,7 @@ An offline-first Progressive Web App for note-taking built with Next.js, TypeScr
 - ✅ Responsive design
 - ✅ Real-time sync status
 - ✅ Conflict resolution (Last Write Wins)
+- ✅ Filters - search and sort options
 
 ## Tech Stack
 
